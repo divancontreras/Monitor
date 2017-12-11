@@ -1,5 +1,6 @@
 class Monitor:
     def __init__(self, name):
+
         self.name = name
         self.continuosMonitor = "plot"
         self.PressureMonitor = "plot"
@@ -10,7 +11,7 @@ class Monitor:
 
     #getters and setters of the class.
 
-    def name():
+    def name(self):
         return self.name
 
     def setContinuosMonitor(self, file, filename):
@@ -43,17 +44,17 @@ class Monitor:
     def getVelocityMonitor(self):
         return self.VelocityMonitor
 
-    def existingGraphs():
-        self.exisitng = []
+    def existingMonitors(self):
+        self.existing = []
         if  self.continuosMonitor != "plot":
-            self.existing("continuosMonitor")
+            self.existing.append("continuosMonitor")
         if self.PressureMonitor != "plot":
-            self.exisitng("PressureMonitor")
+            self.existing.append("PressureMonitor")
         if self.residuals != "plot":
-            self.exisitng("residuals")
+            self.existing.append("residuals")
         if self.TemperatureMonitor != "plot":
-            self.exisitng("TemperatureMonitor")
+            self.existing.append("TemperatureMonitor")
         if self.VelocityMonitor != "plot":
-            self.exisitng("VelocityMonitor")
-            return self.exisitng
+            self.existing.append("VelocityMonitor")
+        return self.existing
 

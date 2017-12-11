@@ -1,4 +1,4 @@
-reset; clear
+﻿reset; clear
 #set encoding iso_8889_1#
 # WSVGA Standard resolution:
 set term wxt noraise noenhanced
