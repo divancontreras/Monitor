@@ -59,6 +59,3 @@ class UIApp:
                 self.listbox.insert(END, filename)
         self.existing_monitors = monitors
 
-    def get_existing_monitors(self):
-        return self.existing_monitors
-

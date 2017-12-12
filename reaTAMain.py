@@ -128,7 +128,6 @@ def main():
     global UIAPP
     global monitors
     UIAPP = UIApp()
-    UIAPP.get_existing_monitors()
 
 if __name__ == "__main__":
     main()
