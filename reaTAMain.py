@@ -1,13 +1,13 @@
-import os
-import shutil
-from tkinter import filedialog
-from tkinter import *
 import time
-from ClassMonitors import *
+from UIMonitorClass import *
+from monitorClass import *
+from tkinter import *
 from pyfiglet import figlet_format
-
+import shutil
+import subprocess
+import os
+from tkinter import filedialog
 # Get current path
-
 
 CURR_DIR_PATH = str(os.getcwd()).replace("\\", "/")
 
@@ -15,14 +15,13 @@ CURR_DIR_PATH = str(os.getcwd()).replace("\\", "/")
 clear = lambda: os.system('cls')
 
 # Initialize the tuple for the multiple.
-global monitors
+global UIAPP
 
 
 def createAMonitor():
     filepath = getFilePath()
     if filepath is None:return  # Assert that the function returned a path
     filename = filepath.split("/")[-1]  # Erase everything before the last slash:  /ab/bc/tu.out > tu.out
-    print(f"File \"{filename}\" selected")
     filename = filename[:filename.find(".")]
     current_monitor = Monitor(filename)
     filepath = os.path.dirname(filepath)
@@ -39,25 +38,23 @@ def assertDirCreation(filename, copy=0):
     while True:
         try:
             if copy == 0:
-                path = CURR_DIR_PATH + f"/monitor-{filename}"
-                os.makedirs(path)
-                return path
+                name = filename
+                os.makedirs(CURR_DIR_PATH+"/monitor-"+name)
+                return name
             else:
-                path = CURR_DIR_PATH + f"/monitor-{filename}({copy})"
-                os.makedirs(path)
-                isCreating = False
-                return path
+                name = f"{filename}({copy})"
+                os.makedirs(CURR_DIR_PATH+"/monitor-"+name)
+                return name
         except:
             copy += 1
 
-
 def configurePlotFiles(filename, current_monitor, filepath):
-    target_folder_path = assertDirCreation(filename)
+    foldername = assertDirCreation(filename)
     for monitor in current_monitor.existingMonitors():
         with open(CURR_DIR_PATH + f"/in/{monitor}.plt", 'r') as file:
             infile = file.read()
             infile = infile.replace("{0}", filepath)
-            infile = infile.replace("{1}", f"{filename} - {monitor}")
+            infile = infile.replace("{1}", f"{foldername}-{monitor}")
             if monitor == "PressureMonitor":
                 infile = infile.replace("{2}", current_monitor.getPressureMonitor())
             elif monitor == "continuosMonitor":
@@ -68,18 +65,39 @@ def configurePlotFiles(filename, current_monitor, filepath):
                 infile = infile.replace("{2}", current_monitor.getTemperatureMonitor())
             elif monitor == "VelocityMonitor":
                 infile = infile.replace("{2}", current_monitor.getVelocityMonitor())
-        with open(target_folder_path + "/" + f"{monitor}.plt", 'w') as outfile:
+        with open(f"{CURR_DIR_PATH}/monitor-{foldername}/{monitor}.plt", 'w') as outfile:
             outfile.write(infile)
-    return target_folder_path
+    return f"{CURR_DIR_PATH}/monitor-{foldername}"
 
-def closeMonitors(monitor):
-    for window in monitor.existingGraphs():
-        os.popen(f"taskkill /F /FI \"WindowTitle {monitor.name} - {window}\" /T")
-    exit()
+def killMonitorTask(monitor_name):
+    for monitor_type in os.listdir(f"{CURR_DIR_PATH}/monitor-{monitor_name}"):
+        monitor_type = monitor_type[:monitor_type.find(".")]
+        try:
+            os.popen(f"taskkill /F /FI \"WindowTitle eq {monitor_name}-{monitor_type}\"")
+        except:
+            pass
+def deleteFolderByName(monitor_name):
+    shutil.rmtree(f"{CURR_DIR_PATH}/monitor-{monitor_name}")
 
-def deleteMonitor(monitor):
-    shutil.rmtree()
+def deleteMonitor(monitor_name, folderExists=True):
+    while folderExists:
+        killMonitorTask(monitor_name)
+        time.sleep(.1)
+        try:
+            deleteFolderByName(monitor_name)
+            folderExists=False
+        except:
+            pass
+def hideAllMonitors():
+    os.popen(f"taskkill /F /IM wgnuplot.exe")
 
+
+def showAMonitor(monitor_name):
+    for file in os.listdir(f"{CURR_DIR_PATH}/monitor-{monitor_name}"):
+        os.popen(f"start {CURR_DIR_PATH}/monitor-{monitor_name}/{file}")
+
+def hideAMonitor(monitor_name):
+    killMonitorTask(monitor_name)
 
 def getMonitorsFromFiles(filename, filepath, current_monitor):
     for file in os.listdir(filepath):
@@ -87,7 +105,6 @@ def getMonitorsFromFiles(filename, filepath, current_monitor):
         if file.endswith(".out"):
             # Recognize if ".out" or ".res" file is from the same project
             if filename in file:
-                print(filepath + "/" + file)
                 current_file = open(filepath + "/" + file, 'r').read()
                 if 'Temperature' in current_file:
                     current_monitor.setTemperatureMonitor(file, filename_complete)
@@ -98,9 +115,7 @@ def getMonitorsFromFiles(filename, filepath, current_monitor):
             elif file.endswith(".res"):
                 if filename in file:
                     current_monitor.setResiduals(file, filename_complete)
-    monitors.append(current_monitor)
     return current_monitor
-
 
 def getFilePath():
     root = Tk()
@@ -109,68 +124,11 @@ def getFilePath():
     if len(filepath) > 0:
         return filepath
 
-
-# Just some utils
-def assertValidInput():
-    # Function to asset a valid numeric input
-    try:
-        userinput = int(input("Select an option:"))
-        return userinput
-    except:
-        print("Only use numeric inputs")
-        time.sleep(.5)
-
-
-def summonFreshLogo():
-    print(figlet_format('KRIPSY', font='starwars'))
-
-
-# The main function
-
 def main():
+    global UIAPP
     global monitors
-    monitors = []
-    window = Tk()
-    window.geometry()
-    window.title("Program Monitors")
-    listbox = Listbox(window)
-    listbox.pack()
-
-    listbox.insert(END, "a list entry")
-
-    for item in ["one", "two", "three", "four"]:
-        listbox.insert(END, item)
-
-    window.mainloop()
-
-
-def program():
-    while True:
-        clear()
-        summonFreshLogo()
-        print("""
-         1.- Create a new monitor
-         2.- Close a monitor
-         9.- Exit program (Closes all monitors)
-         """)
-        userinput = assertValidInput();
-        if userinput == 1:
-            createAMonitor()
-        elif userinput == 2:
-            clear()
-            summonFreshLogo()
-            counter = 0
-            for monitor in monitors:
-                print("Any non-numerical to 'Cancel'")
-                print(f"{counter}.- {monitor.name}")
-                counter += 1
-                monitornumber = assertValidInput()
-                closeMonitors(monitors[monitornumber])
-
-        elif userinput == 9:
-            exit()
-            for monitor in monitors:
-                closeMonitors(monitor)
+    UIAPP = UIApp()
+    UIAPP.get_existing_monitors()
 
 if __name__ == "__main__":
     main()

@@ -11,6 +11,7 @@ set yl "Residuals"
 set xl "Iteration"
 set datafile missing '{{}}'
 set grid
+set term wxt title "{1}"
 set title "Project: {1}"
 set key box outside
  plot "{1}.res" u 1:3 t "continuity" w lp,'' u 1:5 t 'x-velocity' w lp,'' u 1:7 t 'y-velocity' w lp,\

@@ -46,7 +46,7 @@ class Monitor:
 
     def existingMonitors(self):
         self.existing = []
-        if  self.continuosMonitor != "plot":
+        if self.continuosMonitor != "plot":
             self.existing.append("continuosMonitor")
         if self.PressureMonitor != "plot":
             self.existing.append("PressureMonitor")
