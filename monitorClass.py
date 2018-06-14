@@ -1,21 +1,28 @@
 class Monitor:
     def __init__(self, name):
-
         self.name = name
         self.continuosMonitor = "plot"
         self.PressureMonitor = "plot"
         self.residuals = "plot"
         self.TemperatureMonitor = "plot"
         self.VelocityMonitor = "plot"
+        self.path = ""
         self.existing = []
+
 
     #getters and setters of the class.
 
     def name(self):
         return self.name
 
+    def setOriginalPath(self, filename):
+        self.path = filename
+
+    def getOriginalPath(self):
+        return self.path
+
     def setContinuosMonitor(self, file, filename):
-        self.continuosMonitor += f" '{file}' u 1:2 w lp t '{filename}',"
+        self.continuosMonitor = filename
 
     def getContinuosMonitor(self):
         return self.continuosMonitor
@@ -26,8 +33,8 @@ class Monitor:
     def getPressureMonitor(self):
         return self.PressureMonitor
 
-    def setResiduals(self, file, filename):
-        self.residuals += f" '{file}' u 1:2 w lp t '{filename}',"
+    def setResiduals(self, filename):
+        self.residuals = filename
 
     def getResiduals(self):
         return self.residuals

@@ -12,7 +12,7 @@ set yl "Residuals"
 set xl "Iteration"
 set datafile missing '{{}}'
 set grid
-plot "{1}.res" u 1:3 t "continuity" w l,'' u 1:5 t 'x-velocity' w l, '' u 1:7 t 'y-velocity' w l,\
+plot "{2}.res" u 1:3 t "continuity" w l,'' u 1:5 t 'x-velocity' w l, '' u 1:7 t 'y-velocity' w l,\
 '' u 1:9 t 'z-velocity' w l, '' u 1:11 t 'energy' w l,'' u 1:3 t 'k' w l, '' u 1:5 t 'ω or ε' w l
 
 set format "% h"

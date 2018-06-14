@@ -11,13 +11,14 @@ set grid
 set format "% h"
 set term wxt title "{1}"
 set title "Project: {1}"
-set key box outside
 
 # --- TEMPERATURE ---- Monitors
 
 unset logscale y
 set yl "Temperature [°C]"
 set xl "Iteration"
+set key box outside
+
 {2}
 
 pause 10
